@@ -58,21 +58,21 @@ document.querySelectorAll('a, button, .project-card, .contact-card').forEach(el 
 // ===== NAVBAR =====
 window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
-    
+
     // Navbar scroll effect
     if (scrollY > 50) {
         navbar.classList.add('scrolled');
     } else {
         navbar.classList.remove('scrolled');
     }
-    
+
     // Back to top button
     if (scrollY > 500) {
         backToTop.classList.add('visible');
     } else {
         backToTop.classList.remove('visible');
     }
-    
+
     // Active nav link
     updateActiveNavLink();
 });
@@ -95,13 +95,13 @@ document.querySelectorAll('.nav-link').forEach(link => {
 function updateActiveNavLink() {
     const sections = document.querySelectorAll('section[id]');
     const scrollY = window.scrollY + 200;
-    
+
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
         const sectionHeight = section.offsetHeight;
         const sectionId = section.getAttribute('id');
         const navLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
-        
+
         if (navLink && scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             navLink.classList.add('active');
@@ -130,7 +130,7 @@ let typingSpeed = 80;
 
 function type() {
     const currentText = typingTexts[textIndex];
-    
+
     if (isDeleting) {
         typedTextEl.textContent = currentText.substring(0, charIndex - 1);
         charIndex--;
@@ -140,7 +140,7 @@ function type() {
         charIndex++;
         typingSpeed = 80;
     }
-    
+
     if (!isDeleting && charIndex === currentText.length) {
         typingSpeed = 2000;
         isDeleting = true;
@@ -149,7 +149,7 @@ function type() {
         textIndex = (textIndex + 1) % typingTexts.length;
         typingSpeed = 500;
     }
-    
+
     setTimeout(type, typingSpeed);
 }
 
@@ -157,19 +157,19 @@ function type() {
 function initParticles() {
     const ctx = particlesCanvas.getContext('2d');
     let particles = [];
-    
+
     function resizeCanvas() {
         particlesCanvas.width = window.innerWidth;
         particlesCanvas.height = window.innerHeight;
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    
+
     class Particle {
         constructor() {
             this.reset();
         }
-        
+
         reset() {
             this.x = Math.random() * particlesCanvas.width;
             this.y = Math.random() * particlesCanvas.height;
@@ -178,15 +178,15 @@ function initParticles() {
             this.speedY = (Math.random() - 0.5) * 0.5;
             this.opacity = Math.random() * 0.5 + 0.1;
         }
-        
+
         update() {
             this.x += this.speedX;
             this.y += this.speedY;
-            
+
             if (this.x < 0 || this.x > particlesCanvas.width) this.speedX *= -1;
             if (this.y < 0 || this.y > particlesCanvas.height) this.speedY *= -1;
         }
-        
+
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -194,20 +194,20 @@ function initParticles() {
             ctx.fill();
         }
     }
-    
+
     // Create particles
     const particleCount = Math.min(80, Math.floor(window.innerWidth / 20));
     for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle());
     }
-    
+
     function connectParticles() {
         for (let a = 0; a < particles.length; a++) {
             for (let b = a + 1; b < particles.length; b++) {
                 const dx = particles[a].x - particles[b].x;
                 const dy = particles[a].y - particles[b].y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                
+
                 if (distance < 150) {
                     const opacity = (1 - distance / 150) * 0.15;
                     ctx.beginPath();
@@ -220,19 +220,19 @@ function initParticles() {
             }
         }
     }
-    
+
     function animate() {
         ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
-        
+
         particles.forEach(p => {
             p.update();
             p.draw();
         });
-        
+
         connectParticles();
         requestAnimationFrame(animate);
     }
-    
+
     animate();
 }
 
@@ -247,7 +247,7 @@ const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('animated');
-            
+
             // Animate skill bars
             const skillBars = entry.target.querySelectorAll('.skill-bar-fill');
             skillBars.forEach(bar => {
@@ -257,7 +257,7 @@ const scrollObserver = new IntersectionObserver((entries) => {
                     bar.classList.add('animated');
                 }, 200);
             });
-            
+
             // Animate stat numbers
             const statNumbers = entry.target.querySelectorAll('.stat-number');
             statNumbers.forEach(num => {
@@ -283,7 +283,7 @@ function animateCounter(element) {
     const duration = 2000;
     const step = target / (duration / 16);
     let current = 0;
-    
+
     const timer = setInterval(() => {
         current += step;
         if (current >= target) {
@@ -306,7 +306,7 @@ function triggerHeroAnimations() {
 
 // ===== SMOOTH SCROLL FOR NAV LINKS =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+    anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
@@ -320,28 +320,59 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// ===== CONTACT FORM =====
+// ===== CONTACT FORM (Web3Forms) =====
 const contactForm = document.getElementById('contact-form');
-contactForm.addEventListener('submit', (e) => {
+const formResult = document.getElementById('form-result');
+
+contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const btn = contactForm.querySelector('.btn-submit');
+
+    const btn = document.getElementById('submit-btn');
     const originalContent = btn.innerHTML;
-    
+
+    // Show loading state
     btn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
     btn.disabled = true;
-    
-    setTimeout(() => {
-        btn.innerHTML = '<span>Message Sent!</span><i class="fas fa-check"></i>';
-        btn.style.background = 'linear-gradient(135deg, #10b981, #06b6d4)';
-        
-        setTimeout(() => {
-            btn.innerHTML = originalContent;
-            btn.style.background = '';
-            btn.disabled = false;
+    formResult.textContent = '';
+    formResult.className = 'form-result';
+
+    try {
+        const formData = new FormData(contactForm);
+        const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            btn.innerHTML = '<span>Message Sent!</span><i class="fas fa-check"></i>';
+            btn.style.background = 'linear-gradient(135deg, #10b981, #06b6d4)';
+            formResult.textContent = '✅ Thank you! Your message has been sent successfully.';
+            formResult.className = 'form-result success';
             contactForm.reset();
-        }, 3000);
-    }, 1500);
+        } else {
+            throw new Error(data.message || 'Something went wrong');
+        }
+    } catch (error) {
+        btn.innerHTML = '<span>Failed!</span><i class="fas fa-times"></i>';
+        btn.style.background = 'linear-gradient(135deg, #ef4444, #f97316)';
+        formResult.textContent = '❌ Oops! Something went wrong. Please try again.';
+        formResult.className = 'form-result error';
+    }
+
+    // Reset button after 3 seconds
+    setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.style.background = '';
+        btn.disabled = false;
+    }, 3000);
+
+    // Hide result message after 5 seconds
+    setTimeout(() => {
+        formResult.textContent = '';
+        formResult.className = 'form-result';
+    }, 5000);
 });
 
 // ===== TILT EFFECT ON PROJECT CARDS =====
@@ -354,10 +385,10 @@ document.querySelectorAll('.achievement-card, .stat-card').forEach(card => {
         const centerY = rect.height / 2;
         const rotateX = (y - centerY) / 20;
         const rotateY = (centerX - x) / 20;
-        
+
         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
     });
-    
+
     card.addEventListener('mouseleave', () => {
         card.style.transform = '';
     });
@@ -367,7 +398,7 @@ document.querySelectorAll('.achievement-card, .stat-card').forEach(card => {
 document.addEventListener('DOMContentLoaded', () => {
     initParticles();
     type();
-    
+
     // Prevent body scroll while loading
     document.body.style.overflow = 'hidden';
 });
@@ -377,7 +408,7 @@ window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
     const heroImage = document.querySelector('.hero-image');
     const heroContent = document.querySelector('.hero-content');
-    
+
     if (heroImage && scrollY < window.innerHeight) {
         heroImage.style.transform = `translateY(${scrollY * 0.1}px)`;
         heroContent.style.transform = `translateY(${scrollY * 0.05}px)`;

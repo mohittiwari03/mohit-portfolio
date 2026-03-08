@@ -1494,6 +1494,31 @@ img {
     font-size: 1rem;
 }
 
+/* Form Result Message */
+.form-result {
+    margin-top: 1rem;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.form-result.success {
+    padding: 1rem;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.form-result.error {
+    padding: 1rem;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
 /* ===== FOOTER ===== */
 .footer {
     padding: 3rem 0;
